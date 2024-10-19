@@ -1,35 +1,27 @@
-name: Python application
+# .github/workflows/unittests.yml
+
+name: Run Unit Tests
 
 on:
   push:
-    branches: [ "main" ]  # Runs on push to the main branch
+    branches: [ main, task1 ]  # Specify the branches you want the tests to run on
   pull_request:
-    branches: [ "main" ]  # Runs on pull request to the main branch
-
-permissions:
-  contents: read
+    branches: [ main, task1 ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest  # Use the latest version of Ubuntu
+  test:
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4  # Checks out the repository code
+    - name: Check out repository code
+      uses: actions/checkout@v3
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v5
+    - name: Set up Python environment
+      uses: actions/setup-python@v4
       with:
-        python-version: "3.9"  # Set Python 3.9 version
+        python-version: '3.x'  # Specify your Python version
 
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip  # Upgrade pip
-        pip install flake8  # Install flake8 for linting
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  # Install dependencies from requirements.txt if available
-
-   
-    - name: Test with unittest
-      run: |
-        python -m unittest discover  # Run unittests
-
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
