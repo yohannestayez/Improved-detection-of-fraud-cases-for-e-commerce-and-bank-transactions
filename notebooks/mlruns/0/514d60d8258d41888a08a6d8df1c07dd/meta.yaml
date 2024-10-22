@@ -1,0 +1,15 @@
+artifact_uri: file:///c:/Users/Administrator/Documents/kifiya/Week_8/notebooks/mlruns/0/514d60d8258d41888a08a6d8df1c07dd/artifacts
+end_time: 1729547793527
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 514d60d8258d41888a08a6d8df1c07dd
+run_name: CNN_Fraud
+run_uuid: 514d60d8258d41888a08a6d8df1c07dd
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729547043343
+status: 3
+tags: []
+user_id: Administrator

@@ -1,0 +1,15 @@
+artifact_uri: file:///c:/Users/Administrator/Documents/kifiya/Week_8/notebooks/mlruns/0/ce52b06ddddc416f8f7c08ea90d67286/artifacts
+end_time: 1729549853335
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: ce52b06ddddc416f8f7c08ea90d67286
+run_name: CNN_Credit
+run_uuid: ce52b06ddddc416f8f7c08ea90d67286
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729548833923
+status: 3
+tags: []
+user_id: Administrator

@@ -1,0 +1,15 @@
+artifact_uri: file:///c:/Users/Administrator/Documents/kifiya/Week_8/notebooks/mlruns/0/ceb8cc2abcf74d13b03effec2ce22b0f/artifacts
+end_time: 1729548833910
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: ceb8cc2abcf74d13b03effec2ce22b0f
+run_name: Evaluation_MLP_Credit
+run_uuid: ceb8cc2abcf74d13b03effec2ce22b0f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729548831738
+status: 3
+tags: []
+user_id: Administrator

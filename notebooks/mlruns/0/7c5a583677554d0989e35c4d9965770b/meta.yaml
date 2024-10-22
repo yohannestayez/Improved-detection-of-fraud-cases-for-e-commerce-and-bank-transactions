@@ -1,0 +1,15 @@
+artifact_uri: file:///c:/Users/Administrator/Documents/kifiya/Week_8/notebooks/mlruns/0/7c5a583677554d0989e35c4d9965770b/artifacts
+end_time: 1729548082074
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 7c5a583677554d0989e35c4d9965770b
+run_name: Evaluation_RNN_Fraud
+run_uuid: 7c5a583677554d0989e35c4d9965770b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1729548080893
+status: 3
+tags: []
+user_id: Administrator
