@@ -21,6 +21,7 @@ This repository contains a Jupyter notebook focused on data analysis and preproc
   - Uses libraries like `torch`, `sklearn`, and `mlflow`.
   - Loads cleaned datasets (fraud and credit card data) for training.
   - Implements various classifiers such as `LogisticRegression`, `RandomForestClassifier`, and `GradientBoostingClassifier`.
+  - Also implements several deep learning models like MLP, CNN, RNN and LSTM.
   - Splits data into training and testing sets to evaluate model performance.
   - Evaluates models with metrics like accuracy, precision, recall, F1-score, and log loss.
   - Tracks all models and metrics using MLflow for easy comparison.
