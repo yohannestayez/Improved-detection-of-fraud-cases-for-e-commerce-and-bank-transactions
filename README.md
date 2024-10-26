@@ -15,6 +15,19 @@ This repository contains a Jupyter notebook focused on data analysis and preproc
 5. **Data Transformation**: Scaling, normalizing, and encoding categorical variables.
 6. **Saving Processed Data**: Exporting the cleaned and transformed data for use in machine learning pipelines.
 
+### Model_Building_and_Training.ipynb
+- Focuses on building and training machine learning models and deep learning models to detect fraud cases.
+- **Key Features**:
+  - Uses libraries like `torch`, `sklearn`, and `mlflow`.
+  - Loads cleaned datasets (fraud and credit card data) for training.
+  - Implements various classifiers such as `LogisticRegression`, `RandomForestClassifier`, and `GradientBoostingClassifier`.
+  - Also implements several deep learning models like MLP, CNN, RNN and LSTM.
+  - Splits data into training and testing sets to evaluate model performance.
+  - Evaluates models with metrics like accuracy, precision, recall, F1-score, and log loss.
+  - Tracks all models and metrics using MLflow for easy comparison.
+  - Automatically logs parameters, metrics, and models using MLflow's autologging feature.
+
+
 ## Installation
 
 To run the notebook, you need to set up a Python environment with the necessary dependencies. The following steps outline how to do this:
@@ -49,14 +62,10 @@ Make sure to install the following Python libraries:
 - `matplotlib`
 - `seaborn`
 - `scikit-learn`
+- `PyTorch`
+- `MLflow`
+- `imblearn`
 - Any other dependencies used in the notebook can be found in the `requirements.txt` file.
-
-## Key Features
-
-- **Data Cleaning**: The notebook includes robust methods for dealing with missing and inconsistent data.
-- **EDA**: Provides insightful visualizations and statistical summaries to understand the data distribution and relationships.
-- **Feature Engineering**: Introduces techniques such as one-hot encoding, scaling, and generating new features from existing ones.
-- **Reusable Workflow**: The notebook is modular and can be adapted for other datasets with minimal changes.
 
 ## Usage
 
