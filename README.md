@@ -1,7 +1,7 @@
 # Improved detection of fraud cases for e-commerce and bank transactions
 
 ## overview
-This repository contains a Jupyter notebook focused on data analysis and preprocessing techniques. The notebook provides a comprehensive workflow for preparing datasets for further modeling and analysis, particularly for machine learning projects.
+This repository includes a Jupyter notebook that demonstrates a complete workflow for data analysis, preprocessing, and model interpretability. It guides users through preparing datasets for machine learning applications, particularly in credit scoring and fraud detection. The notebook also includes code for training, saving, and interpreting both deep learning models and traditional machine learning classifiers. Using explainability techniques like SHAP (SHapley Additive exPlanations) and LIME (Local Interpretable Model-agnostic Explanations), this project emphasizes model transparency to build trust and enhance decision-making insights.
 
 ## Notebooks
 
@@ -27,6 +27,18 @@ This repository contains a Jupyter notebook focused on data analysis and preproc
   - Evaluates models with metrics like accuracy, precision, recall, F1-score, and log loss.
   - Tracks all models and metrics using MLflow for easy comparison.
   - Automatically logs parameters, metrics, and models using MLflow's autologging feature.
+
+### Model_Explainability.ipynb
+The notebook loads various pre-trained models (PyTorch and scikit-learn) for both credit scoring and fraud detection datasets. It also handles dataset preparation, removing irrelevant columns and performing train-test splits. The models are stored in a dictionary format for easy retrieval.
+
+#### Explainability Analysis
+This section leverages SHAP and LIME libraries for explainability:
+1. **SHAP**: Applies SHAP explainability to traditional machine learning models and deep learning models separately. The `TreeExplainer` is used for tree-based models, while `KernelExplainer` is used for general-purpose explainability. For each model, SHAP summary plots highlight feature importance, with a specific focus on interpreting the model's predictions for fraud detection and credit risk assessment.
+  
+2. **LIME**: The notebook generates LIME explanations for both traditional machine learning and deep learning models, providing instance-specific feature contributions. Each LIME analysis focuses on a single sample to demonstrate how specific feature values contribute to the prediction.
+
+### Explainability for PyTorch Models
+Custom functions are implemented to compute SHAP values for PyTorch models, accommodating neural network architectures. Additionally, LIME explanations are generated for these models with a custom prediction function to handle binary classification probabilities.
 
 
 ## Installation
@@ -66,6 +78,9 @@ Make sure to install the following Python libraries:
 - `PyTorch`
 - `MLflow`
 - `imblearn`
+- `shap`
+- `lime`
+- `joblib`
 - Any other dependencies used in the notebook can be found in the `requirements.txt` file.
 
 ## Usage
