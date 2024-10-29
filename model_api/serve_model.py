@@ -3,42 +3,53 @@ import torch
 import joblib
 import torch.nn.functional as F
 import numpy as np
-from model_definitions import  RNNModel  # Import model classes
+from model_definitions import RNNModel
+import logging
 
 # Initialize Flask app
 app = Flask(__name__)
 
+# Configure logging
+logging.basicConfig(
+    filename='app.log', 
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
 input_size = 100  # Adjust as per the input feature size of your models
 
 # Load the fraud model
-# fraud_model = MLPModel(input_size)
-# fraud_model = torch.load('model_api/models/MLP_Fraud.pt')
-# fraud_model.eval()
 fraud_model = joblib.load('model_api/models/DecisionTree_Fraud.joblib')
+
 # Load the credit card model
 creditcard_model = RNNModel(input_size)
 creditcard_model = torch.load('model_api/models/RNN_Credit.pt')
 creditcard_model.eval()
 
-# Route to serve the favicon
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory('static', 'favicon.ico')
 
-# Home route
 @app.route('/')
 def home():
+    app.logger.info("Home endpoint accessed")
     return "Model API for Fraud and Credit Card Detection is running!"
 
-# Prediction endpoint for the fraud model
 @app.route('/predict/fraud', methods=['POST'])
 def predict_fraud():
-    data = request.get_json()
-    features = np.array(data['features']).reshape(1, -1)  # Ensure input format
-    prediction = fraud_model.predict(features)  # Predict using the loaded joblib model
-    return jsonify({'prediction': prediction[0]})
+    try:
+        data = request.get_json()
+        features = np.array(data['features']).reshape(1, -1)
+        prediction = fraud_model.predict(features)
+        
+        app.logger.info(f"Fraud prediction request received with data: {data}")
+        app.logger.info(f"Fraud prediction result: {prediction[0]}")
+        
+        return jsonify({'prediction': prediction[0]})
+    except Exception as e:
+        app.logger.error(f"Error in fraud prediction: {e}")
+        return jsonify({'error': str(e)}), 500
 
-# Prediction endpoint for the credit card model
 @app.route('/predict/creditcard', methods=['POST'])
 def predict_creditcard():
     try:
@@ -49,10 +60,13 @@ def predict_creditcard():
             output = creditcard_model(input_tensor)
             probabilities = torch.softmax(output, dim=1).numpy().tolist()
         
+        app.logger.info(f"Credit card prediction request received with data: {data}")
+        app.logger.info(f"Credit card prediction probabilities: {probabilities}")
+        
         return jsonify({'creditcard_predictions': probabilities})
     except Exception as e:
-        return jsonify({'error': str(e)})
+        app.logger.error(f"Error in credit card prediction: {e}")
+        return jsonify({'error': str(e)}), 500
 
-# Run the app
 if __name__ == '__main__':
     app.run(debug=True)
