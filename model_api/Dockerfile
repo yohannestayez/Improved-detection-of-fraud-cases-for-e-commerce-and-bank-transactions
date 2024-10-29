@@ -1,16 +1,16 @@
-# Use an official PyTorch runtime as a parent image
-FROM pytorch/pytorch:1.8.1-cuda11.1-cudnn8-runtime
+# Use a Python runtime as a parent image
+FROM python:3.8-slim
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
+# Copy the Flask app and models
 COPY . .
 
-# Install additional Python dependencies
+# Install dependencies
 RUN pip install -r requirements.txt
 
-# Expose port 5000 for the Flask API
+# Expose the API port
 EXPOSE 5000
 
 # Run the Flask application
