@@ -6,14 +6,15 @@ This repository contains a Jupyter notebook focused on data analysis and preproc
 ## Notebooks
 
 ### Data_Analysis_and_Preprocessing.ipynb
-- This notebook demonstrates how to handle raw data, clean it, perform exploratory data analysis (EDA), and transform it into a format suitable for machine learning algorithms. The key steps covered in the notebook include:
+- This notebook demonstrates how to handle raw data, clean it, perform exploratory data analysis (EDA), and transform it into a format suitable for machine learning algorithms. 
 
-1. **Loading the Data**: Reading raw data from various sources such as CSV, JSON, or Excel files.
-2. **Data Cleaning**: Handling missing values, correcting data types, and removing duplicates.
-3. **Exploratory Data Analysis (EDA)**: Identifying patterns, trends, and correlations within the data using various visualization techniques.
-4. **Feature Engineering**: Creating new features from the existing ones to improve model performance.
-5. **Data Transformation**: Scaling, normalizing, and encoding categorical variables.
-6. **Saving Processed Data**: Exporting the cleaned and transformed data for use in machine learning pipelines.
+- **Key Features**:
+    - **Loading the Data**: Reading raw data from various sources such as CSV, JSON, or Excel files.
+    -  **Data Cleaning**: Handling missing values, correcting data types, and removing duplicates.
+    - **Exploratory Data Analysis (EDA)**: Identifying patterns, trends, and correlations within the data using various visualization techniques.
+    - **Feature Engineering**: Creating new features from the existing ones to improve model performance.
+    - **Data Transformation**: Scaling, normalizing, and encoding categorical variables.
+    - **Saving Processed Data**: Exporting the cleaned and transformed data for use in machine learning pipelines.
 
 ### Model_Building_and_Training.ipynb
 - Focuses on building and training machine learning models and deep learning models to detect fraud cases.
