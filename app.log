@@ -15,3 +15,27 @@
 2024-10-29 22:11:36,634 - INFO - Home endpoint accessed
 2024-10-29 22:11:36,634 - INFO - 127.0.0.1 - - [29/Oct/2024 22:11:36] "GET / HTTP/1.1" 200 -
 2024-10-29 22:11:57,953 - INFO -  * Detected change in 'c:\\Users\\Administrator\\Documents\\kifiya\\Week_8\\model_api\\serve_model.py', reloading
+2024-10-29 22:11:58,511 - INFO -  * Restarting with stat
+2024-10-29 22:12:02,362 - WARNING -  * Debugger is active!
+2024-10-29 22:12:02,365 - INFO -  * Debugger PIN: 740-244-939
+2024-10-29 22:12:30,706 - INFO - Home endpoint accessed
+2024-10-29 22:12:30,708 - INFO - 127.0.0.1 - - [29/Oct/2024 22:12:30] "GET / HTTP/1.1" 200 -
+2024-10-29 22:12:31,266 - INFO - Home endpoint accessed
+2024-10-29 22:12:31,266 - INFO - 127.0.0.1 - - [29/Oct/2024 22:12:31] "GET / HTTP/1.1" 200 -
+2024-10-29 22:12:31,454 - INFO - Home endpoint accessed
+2024-10-29 22:12:31,455 - INFO - 127.0.0.1 - - [29/Oct/2024 22:12:31] "GET / HTTP/1.1" 200 -
+2024-10-29 22:12:31,640 - INFO - Home endpoint accessed
+2024-10-29 22:12:31,640 - INFO - 127.0.0.1 - - [29/Oct/2024 22:12:31] "GET / HTTP/1.1" 200 -
+2024-10-29 22:12:31,815 - INFO - Home endpoint accessed
+2024-10-29 22:12:31,816 - INFO - 127.0.0.1 - - [29/Oct/2024 22:12:31] "GET / HTTP/1.1" 200 -
+2024-10-29 22:12:31,967 - INFO - Home endpoint accessed
+2024-10-29 22:12:31,968 - INFO - 127.0.0.1 - - [29/Oct/2024 22:12:31] "GET / HTTP/1.1" 200 -
+2024-10-29 22:12:32,148 - INFO - Home endpoint accessed
+2024-10-29 22:12:32,148 - INFO - 127.0.0.1 - - [29/Oct/2024 22:12:32] "GET / HTTP/1.1" 200 -
+2024-10-29 22:12:36,814 - INFO - Home endpoint accessed
+2024-10-29 22:12:36,815 - INFO - 127.0.0.1 - - [29/Oct/2024 22:12:36] "GET / HTTP/1.1" 200 -
+2024-10-29 22:19:35,848 - INFO - Home endpoint accessed
+2024-10-29 22:19:35,849 - INFO - 127.0.0.1 - - [29/Oct/2024 22:19:35] "GET / HTTP/1.1" 200 -
+2024-10-29 22:19:50,736 - INFO - 127.0.0.1 - - [29/Oct/2024 22:19:50] "[33mGET /home HTTP/1.1[0m" 404 -
+2024-10-29 22:19:56,933 - INFO - Home endpoint accessed
+2024-10-29 22:19:56,933 - INFO - 127.0.0.1 - - [29/Oct/2024 22:19:56] "GET / HTTP/1.1" 200 -

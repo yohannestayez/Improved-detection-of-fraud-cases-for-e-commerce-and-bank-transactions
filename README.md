@@ -40,7 +40,6 @@ This section leverages SHAP and LIME libraries for explainability:
 ### Explainability for PyTorch Models
 Custom functions are implemented to compute SHAP values for PyTorch models, accommodating neural network architectures. Additionally, LIME explanations are generated for these models with a custom prediction function to handle binary classification probabilities.
 
-
 ## Installation
 
 To run the notebook, you need to set up a Python environment with the necessary dependencies. The following steps outline how to do this:
@@ -89,6 +88,77 @@ This notebook is ideal for data scientists and analysts looking to:
 - Perform initial data exploration.
 - Clean and preprocess data for machine learning tasks.
 - Gain insights into the structure and properties of a dataset.
+
+## Fraud and Credit Card Detection Model API
+
+A Flask API for serving and monitoring fraud and credit card detection models, deployed in a Docker container. This API allows users to submit data for predictions on two models:
+- **Fraud Detection Model** (Decision Tree model)
+- **Credit Card Detection Model** (RNN model)
+
+### Project Structure
+
+```
+model_api/
+├── models/
+│   ├── DecisionTree_Fraud.joblib        # Pre-trained fraud detection model
+│   └── RNN_Credit.pt                    # Pre-trained credit card model
+├── serve_model.py                       # Main Flask application
+├── requirements.txt                     # Python dependencies
+└── Dockerfile                           # Docker 
+```
+
+### Getting Started
+
+#### Requirements
+
+- Python 3.x
+- Docker
+- Flask and required dependencies (listed in `requirements.txt`)
+
+#### Installation
+
+1. Clone the repository:
+   ```bash
+      git clone https://github.com/yohannestayez/Improved-detection-of-fraud-cases-for-e-commerce-and-bank-transactions.git
+   cd fraud-creditcard-api/model_api
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run the API locally:
+   ```bash
+   python serve_model.py
+   ```
+
+4. To test predictions, use `POST` requests to `/predict/fraud` or `/predict/creditcard` with JSON payloads.
+
+### API Endpoints
+
+- **`GET /`**: Home route; checks if the API is running.
+- **`POST /predict/fraud`**: Sends JSON data to the fraud detection model.
+- **`POST /predict/creditcard`**: Sends JSON data to the credit card detection model.
+
+
+### Dockerization
+
+1. Build the Docker image:
+   ```bash
+   docker build -t fraud-detection-api .
+   ```
+
+2. Run the Docker container:
+   ```bash
+   docker run -p 5000:5000 fraud-detection-api
+   ```
+
+### Monitoring and Logging
+
+- **Logging**: Logs incoming requests, prediction results, and errors. Logs are stored in `app.log`.
+- **Future Extensions**: For advanced monitoring, integrate with monitoring solutions like Prometheus or Grafana.
+
 
 ## Contributing
 
