@@ -7,15 +7,16 @@ from model_definitions import MLPModel, RNNModel  # Import model classes
 # Initialize Flask app
 app = Flask(__name__)
 
-input_size = 30 
+input_size = 30  # Adjust as per the input feature size of your models
+
 # Load the fraud model
 fraud_model = MLPModel(input_size)
-fraud_model= torch.load('model_api/models/MLP_Fraud.pt')
+fraud_model = torch.load('model_api/models/MLP_Fraud.pt')
 fraud_model.eval()
 
 # Load the credit card model
 creditcard_model = RNNModel(input_size)
-creditcard_model=torch.load('model_api/models/RNN_Credit.pt')
+creditcard_model = torch.load('model_api/models/RNN_Credit.pt')
 creditcard_model.eval()
 
 # Route to serve the favicon
@@ -23,12 +24,12 @@ creditcard_model.eval()
 def favicon():
     return send_from_directory('static', 'favicon.ico')
 
-# Define routes
+# Home route
 @app.route('/')
 def home():
     return "Model API for Fraud and Credit Card Detection is running!"
 
-# Prediction for Fraud model
+# Prediction endpoint for the fraud model
 @app.route('/predict/fraud', methods=['POST'])
 def predict_fraud():
     try:
@@ -43,7 +44,7 @@ def predict_fraud():
     except Exception as e:
         return jsonify({'error': str(e)})
 
-# Prediction for Credit Card model
+# Prediction endpoint for the credit card model
 @app.route('/predict/creditcard', methods=['POST'])
 def predict_creditcard():
     try:
