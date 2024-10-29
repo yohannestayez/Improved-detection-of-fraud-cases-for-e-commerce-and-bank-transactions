@@ -159,6 +159,9 @@ model_api/
 - **Logging**: Logs incoming requests, prediction results, and errors. Logs are stored in `app.log`.
 - **Future Extensions**: For advanced monitoring, integrate with monitoring solutions like Prometheus or Grafana.
 
+## Dashboard
+
+This folder provides a web-based dashboard for analyzing fraud data and making predictions using machine learning models. It consists of a Flask API for model serving and a Dash application for interactive visualizations. more description in the folder.
 
 ## Contributing
 
