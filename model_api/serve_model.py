@@ -16,7 +16,7 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
-input_size = 100  # Adjust as per the input feature size of your models
+input_size = 100  
 
 # Load the fraud model
 fraud_model = joblib.load('model_api/models/DecisionTree_Fraud.joblib')

@@ -1,0 +1,17 @@
+2024-10-29 22:10:47,277 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-10-29 22:10:47,277 - INFO - [33mPress CTRL+C to quit[0m
+2024-10-29 22:10:47,279 - INFO -  * Restarting with stat
+2024-10-29 22:10:51,124 - WARNING -  * Debugger is active!
+2024-10-29 22:10:51,129 - INFO -  * Debugger PIN: 740-244-939
+2024-10-29 22:11:33,894 - INFO - Home endpoint accessed
+2024-10-29 22:11:33,895 - INFO - 127.0.0.1 - - [29/Oct/2024 22:11:33] "GET / HTTP/1.1" 200 -
+2024-10-29 22:11:35,663 - INFO - Home endpoint accessed
+2024-10-29 22:11:35,664 - INFO - 127.0.0.1 - - [29/Oct/2024 22:11:35] "GET / HTTP/1.1" 200 -
+2024-10-29 22:11:36,237 - INFO - Home endpoint accessed
+2024-10-29 22:11:36,237 - INFO - 127.0.0.1 - - [29/Oct/2024 22:11:36] "GET / HTTP/1.1" 200 -
+2024-10-29 22:11:36,438 - INFO - Home endpoint accessed
+2024-10-29 22:11:36,438 - INFO - 127.0.0.1 - - [29/Oct/2024 22:11:36] "GET / HTTP/1.1" 200 -
+2024-10-29 22:11:36,634 - INFO - Home endpoint accessed
+2024-10-29 22:11:36,634 - INFO - 127.0.0.1 - - [29/Oct/2024 22:11:36] "GET / HTTP/1.1" 200 -
+2024-10-29 22:11:57,953 - INFO -  * Detected change in 'c:\\Users\\Administrator\\Documents\\kifiya\\Week_8\\model_api\\serve_model.py', reloading
