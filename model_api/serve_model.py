@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import torch
 import torch.nn.functional as F
 import numpy as np
@@ -10,13 +10,18 @@ app = Flask(__name__)
 input_size = 30 
 # Load the fraud model
 fraud_model = MLPModel(input_size)
-fraud_model.load_state_dict(torch.load('models/MLP_Fraud.pt'))
+fraud_model= torch.load('model_api/models/MLP_Fraud.pt')
 fraud_model.eval()
 
 # Load the credit card model
 creditcard_model = RNNModel(input_size)
-creditcard_model.load_state_dict(torch.load('models/RNN_Credit.pt'))
+creditcard_model=torch.load('model_api/models/RNN_Credit.pt')
 creditcard_model.eval()
+
+# Route to serve the favicon
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory('static', 'favicon.ico')
 
 # Define routes
 @app.route('/')
