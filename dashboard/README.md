@@ -11,16 +11,7 @@ project_root_folder/
 │   │   ├── DecisionTree_Fraud.joblib  
 │   │   └── RNN_Credit.pt              
 │   └── serve_model.py                 
-├── dashboard/
-│   ├── static/
-│   │   ├── css/
-│   │   │   └── styles.css             
-│   │   └── images/
-│   │       └── favicon.ico            
-│   ├── templates/
-│   │   └── index.html                 
-│   ├── data/
-│   │   └── merged_data.csv            
+├── dashboard/        
 │   ├── dashboard_app.py               
 │   └── requirements.txt               
 ├── Dockerfile                         
