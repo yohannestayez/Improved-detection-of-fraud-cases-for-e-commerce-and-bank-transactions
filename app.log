@@ -39,3 +39,9 @@
 2024-10-29 22:19:50,736 - INFO - 127.0.0.1 - - [29/Oct/2024 22:19:50] "[33mGET /home HTTP/1.1[0m" 404 -
 2024-10-29 22:19:56,933 - INFO - Home endpoint accessed
 2024-10-29 22:19:56,933 - INFO - 127.0.0.1 - - [29/Oct/2024 22:19:56] "GET / HTTP/1.1" 200 -
+2024-11-02 22:49:43,454 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-11-02 22:49:43,454 - INFO - [33mPress CTRL+C to quit[0m
+2024-11-02 22:49:43,459 - INFO -  * Restarting with stat
+2024-11-02 22:49:46,799 - WARNING -  * Debugger is active!
+2024-11-02 22:49:46,799 - INFO -  * Debugger PIN: 115-925-533
