@@ -1,8 +1,7 @@
-Flask
+flask
 dash
-torch
-joblib
-numpy
 pandas
-requests
 plotly
+socket
+struct
+
