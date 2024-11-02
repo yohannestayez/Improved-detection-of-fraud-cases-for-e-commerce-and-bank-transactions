@@ -2,6 +2,4 @@ flask
 dash
 pandas
 plotly
-socket
-struct
 
