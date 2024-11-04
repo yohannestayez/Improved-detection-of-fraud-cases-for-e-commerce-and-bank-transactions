@@ -20,9 +20,9 @@ def ip_to_int(ip):
 
 # Load datasets
 def load_data():
-    fraud_data = pd.read_csv('C:/Users/Administrator/Documents/kifiya/Week_8/clean_data/Fraud_Data.csv')
-    credit_data = pd.read_csv('C:/Users/Administrator/Documents/kifiya/Week_8/clean_data/creditcard.csv')
-    ip_country = pd.read_csv('C:/Users/Administrator/Documents/kifiya/Week_8/clean_data/IpAddress_to_Country.csv')
+    fraud_data = pd.read_csv('dashboard/data/Fraud_Data.csv')
+    credit_data = pd.read_csv('dashboard/data/render_creditcard.csv')
+    ip_country = pd.read_csv('dashboard/data/IpAddress_to_Country.csv')
     return fraud_data, credit_data, ip_country
 
 # Data processing functions
