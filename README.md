@@ -161,7 +161,8 @@ model_api/
 
 ## Dashboard
 
-This folder provides a web-based dashboard for analyzing fraud data and making predictions using machine learning models. It consists of a Flask API for model serving and a Dash application for interactive visualizations. more description in the folder.
+- This folder provides a web-based dashboard for analyzing fraud data and making predictions using machine learning models. It consists of a Flask API for model serving and a Dash application for interactive visualizations. more description in the folder.
+- 📫 Feel free to checkout out the dashboard at <a href="https://detection-of-fraud-cases-for-e-commerce.onrender.com">https://detection-of-fraud-cases-for-e-commerce.onrender.com</a>
 
 ## Contributing
 
