@@ -1,8 +1,7 @@
-from dash import Dash, html, dcc
+from dash import Dash, html, dcc, Input, Output
 import plotly.express as px
 import pandas as pd
 from flask import Flask
-from datetime import datetime
 import socket
 import struct
 
@@ -26,7 +25,7 @@ def load_data():
     return fraud_data, credit_data, ip_country
 
 # Data processing functions
-def process_ecommerce_data(fraud_data, ip_country):
+def process_ecommerce_data(fraud_data, ip_country): 
     fraud_data_cleaned = fraud_data.copy()
     ip_country_cleaned = ip_country.copy()
 
@@ -76,153 +75,90 @@ ecom_stats, credit_stats = create_summary_stats(fraud_data_processed, credit_dat
 
 # Create the dashboard layout
 app.layout = html.Div([
+    # JavaScript for alerts
+    html.Script("""
+        function showAlert(message) {
+            alert(message);
+        }
+    """),
+
     # Navigation bar
     html.Div([
         html.H1('Fraud Detection Dashboard', className='nav-title'),
-        html.P('fraud analytics and insights', className='nav-subtitle')
+        html.P('Fraud analytics and insights', className='nav-subtitle')
     ], className='navbar'),
 
-    # Main content container
+    # Filters
     html.Div([
-        # Summary Statistics Cards
+        html.Label("Filter by Country:"),
+        dcc.Dropdown(
+            id='country-filter',
+            options=[{'label': country, 'value': country} for country in fraud_data_processed['country'].dropna().unique()],
+            placeholder="Select a country"
+        )
+    ], className='filter-container'),
+
+    # Summary Statistics Cards
+    html.Div([
         html.Div([
-            html.Div([
-                html.Div([
-                    html.I(className='fas fa-shopping-cart stat-icon'),
-                    html.Div([
-                        html.H3('E-commerce Transactions'),
-                        html.Div([
-                            html.P([
-                                html.Span('Total Transactions: ', className='stat-label'),
-                                html.Span(f"{ecom_stats['total_transactions']:,}", className='stat-value')
-                            ]),
-                            html.P([
-                                html.Span('Fraud Cases: ', className='stat-label'),
-                                html.Span(f"{ecom_stats['fraud_cases']:,}", className='stat-value fraud-value')
-                            ]),
-                            html.P([
-                                html.Span('Fraud Percentage: ', className='stat-label'),
-                                html.Span(f"{ecom_stats['fraud_percentage']}%", className='stat-value fraud-value')
-                            ])
-                        ], className='stat-details')
-                    ])
-                ], className='stat-card')
-            ], className='col-md-6'),
+            html.H3('E-commerce Transactions'),
+            html.P(f"Total Transactions: {ecom_stats['total_transactions']:,}"),
+            html.P(f"Fraud Cases: {ecom_stats['fraud_cases']:,}"),
+            html.P(f"Fraud Percentage: {ecom_stats['fraud_percentage']}%")
+        ], className='stat-card'),
 
-            html.Div([
-                html.Div([
-                    html.I(className='fas fa-credit-card stat-icon'),
-                    html.Div([
-                        html.H3('Credit Card Transactions'),
-                        html.Div([
-                            html.P([
-                                html.Span('Total Transactions: ', className='stat-label'),
-                                html.Span(f"{credit_stats['total_transactions']:,}", className='stat-value')
-                            ]),
-                            html.P([
-                                html.Span('Fraud Cases: ', className='stat-label'),
-                                html.Span(f"{credit_stats['fraud_cases']:,}", className='stat-value fraud-value')
-                            ]),
-                            html.P([
-                                html.Span('Fraud Percentage: ', className='stat-label'),
-                                html.Span(f"{credit_stats['fraud_percentage']}%", className='stat-value fraud-value')
-                            ])
-                        ], className='stat-details')
-                    ])
-                ], className='stat-card')
-            ], className='col-md-6')
-        ], className='row stats-container'),
-
-        # Charts Section
         html.Div([
-            html.Div([
-                html.Div([
-                    html.H3('Fraud Trends Over Time', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.line(
-                            fraud_data_processed.groupby(fraud_data_processed['purchase_time'].dt.date)['class'].sum().reset_index(),
-                            x='purchase_time',
-                            y='class',
-                            template='plotly_white'
-                        ).update_traces(line_color='#e74c3c')
-                    )
-                ], className='chart-card')
-            ], className='mb-4'),
+            html.H3('Credit Card Transactions'),
+            html.P(f"Total Transactions: {credit_stats['total_transactions']:,}"),
+            html.P(f"Fraud Cases: {credit_stats['fraud_cases']:,}"),
+            html.P(f"Fraud Percentage: {credit_stats['fraud_percentage']}%")
+        ], className='stat-card')
+    ], className='stats-container'),
 
-            html.Div([
-                html.H3('Geographical Distribution of Fraud', className='chart-title'),
-                dcc.Graph(
-                    figure=px.choropleth(
-                        fraud_data_processed[fraud_data_processed['class'] == 1].groupby('country').size().reset_index(name='count'),
-                        locations='country',
-                        locationmode='country names',
-                        color='count',
-                        color_continuous_scale='Reds',
-                        template='plotly_white'
-                    )
-                )
-            ], className='chart-card mb-4'),
-
-            # Device and Browser Analysis
-            html.Div([
-                html.Div([
-                    html.H3('Fraud by Device', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.bar(
-                            fraud_data_processed.groupby(['device_id', 'class']).size().unstack().fillna(0),
-                            template='plotly_white',
-                            color_discrete_sequence=['#2ecc71', '#e74c3c']
-                        )
-                    )
-                ], className='chart-card col-md-6'),
-
-                html.Div([
-                    html.H3('Fraud by Browser', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.bar(
-                            fraud_data_processed.groupby(['browser', 'class']).size().unstack().fillna(0),
-                            template='plotly_white',
-                            color_discrete_sequence=['#2ecc71', '#e74c3c']
-                        )
-                    )
-                ], className='chart-card col-md-6')
-            ], className='row mb-4'),
-
-            # Time Patterns
-            html.Div([
-                html.Div([
-                    html.H3('Fraud by Hour of Day', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.bar(
-                            fraud_data_processed[fraud_data_processed['class'] == 1].groupby('purchase_hour').size(),
-                            template='plotly_white',
-                            color_discrete_sequence=['#e74c3c']
-                        ).update_layout(
-                            xaxis_title='Hour of Day',
-                            yaxis_title='Number of Fraud Cases'
-                        )
-                    )
-                ], className='chart-card col-md-6'),
-
-                html.Div([
-                    html.H3('Fraud by Day of Week', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.bar(
-                            fraud_data_processed[fraud_data_processed['class'] == 1].groupby('purchase_day').size(),
-                            template='plotly_white',
-                            color_discrete_sequence=['#e74c3c']
-                        ).update_layout(
-                            xaxis_title='Day of Week',
-                            yaxis_title='Number of Fraud Cases'
-                        )
-                    )
-                ], className='chart-card col-md-6')
-            ], className='row mb-4')
-        ], className='charts-container')
-    ], className='main-content')
+    # Charts Section
+    html.Div([
+        dcc.Graph(id='fraud-trends'),
+        dcc.Graph(id='fraud-map')
+    ], className='charts-container')
 ])
 
-# CSS and Enhanced Styling
+# Callbacks for interactivity
+@app.callback(
+    [Output('fraud-trends', 'figure'),
+     Output('fraud-map', 'figure')],
+    [Input('country-filter', 'value')]
+)
+def update_charts(selected_country):
+    if selected_country:
+        filtered_data = fraud_data_processed[fraud_data_processed['country'] == selected_country]
+        js_alert = f"showAlert('Filtered by country: {selected_country} with {len(filtered_data)} records.');"
+    else:
+        filtered_data = fraud_data_processed
+        js_alert = f"showAlert('Showing data for all countries.');"
+
+    # Execute the JavaScript alert
+    app.layout.children.append(html.Script(js_alert))
+
+    # Update the fraud trends chart
+    fraud_trends = px.line(
+        filtered_data.groupby(filtered_data['purchase_time'].dt.date)['class'].sum().reset_index(),
+        x='purchase_time',
+        y='class',
+        title='Fraud Trends Over Time'
+    )
+
+    # Update the fraud map
+    fraud_map = px.choropleth(
+        filtered_data[filtered_data['class'] == 1].groupby('country').size().reset_index(name='count'),
+        locations='country',
+        locationmode='country names',
+        color='count',
+        title='Geographical Distribution of Fraud',
+        color_continuous_scale='Reds'
+    )
+
+    return fraud_trends, fraud_map
+
 app.index_string = '''
 <!DOCTYPE html>
 <html>
@@ -430,5 +366,6 @@ app.index_string = '''
 </html>
 '''
 
-if __name__ == "__main__":
-    app.run_server(host="0.0.0.0", port=8080, debug=False)
+# Run the app
+if __name__ == '__main__':
+    app.run_server(debug=True)
