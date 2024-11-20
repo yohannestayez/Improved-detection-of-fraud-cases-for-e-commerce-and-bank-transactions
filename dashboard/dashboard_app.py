@@ -1,7 +1,8 @@
-from dash import Dash, html, dcc, Input, Output
+from dash import Dash, html, dcc, Input, Output, State, callback_context
 import plotly.express as px
 import pandas as pd
 from flask import Flask
+from datetime import datetime
 import socket
 import struct
 
@@ -25,7 +26,7 @@ def load_data():
     return fraud_data, credit_data, ip_country
 
 # Data processing functions
-def process_ecommerce_data(fraud_data, ip_country): 
+def process_ecommerce_data(fraud_data, ip_country):
     fraud_data_cleaned = fraud_data.copy()
     ip_country_cleaned = ip_country.copy()
 
@@ -73,91 +74,152 @@ fraud_data, credit_data, ip_country = load_data()
 fraud_data_processed = process_ecommerce_data(fraud_data, ip_country)
 ecom_stats, credit_stats = create_summary_stats(fraud_data_processed, credit_data)
 
-# Create the dashboard layout
+# App layout
 app.layout = html.Div([
-    # JavaScript for alerts
-    html.Script("""
-        function showAlert(message) {
-            alert(message);
-        }
-    """),
-
     # Navigation bar
     html.Div([
         html.H1('Fraud Detection Dashboard', className='nav-title'),
-        html.P('Fraud analytics and insights', className='nav-subtitle')
+        html.P('fraud analytics and insights', className='nav-subtitle')
     ], className='navbar'),
 
     # Filters
     html.Div([
-        html.Label("Filter by Country:"),
-        dcc.Dropdown(
-            id='country-filter',
-            options=[{'label': country, 'value': country} for country in fraud_data_processed['country'].dropna().unique()],
-            placeholder="Select a country"
-        )
-    ], className='filter-container'),
+        dcc.DatePickerRange(
+            id='date-filter',
+            start_date=fraud_data_processed['purchase_time'].min(),
+            end_date=fraud_data_processed['purchase_time'].max(),
+            display_format='YYYY-MM-DD',
+            className='date-picker'
+        ),
+        html.Button('Filter', id='filter-button', className='filter-button')
+    ], className='filters-container'),
 
-    # Summary Statistics Cards
+    # Main content container
     html.Div([
+        # Summary Statistics Cards
         html.Div([
-            html.H3('E-commerce Transactions'),
-            html.P(f"Total Transactions: {ecom_stats['total_transactions']:,}"),
-            html.P(f"Fraud Cases: {ecom_stats['fraud_cases']:,}"),
-            html.P(f"Fraud Percentage: {ecom_stats['fraud_percentage']}%")
-        ], className='stat-card'),
+            html.Div([
+                html.Div([
+                    html.I(className='fas fa-shopping-cart stat-icon'),
+                    html.Div([
+                        html.H3('E-commerce Transactions'),
+                        html.Div([
+                            html.P([
+                                html.Span('Total Transactions: ', className='stat-label'),
+                                html.Span(f"{ecom_stats['total_transactions']:,}", className='stat-value')
+                            ]),
+                            html.P([
+                                html.Span('Fraud Cases: ', className='stat-label'),
+                                html.Span(f"{ecom_stats['fraud_cases']:,}", className='stat-value fraud-value')
+                            ]),
+                            html.P([
+                                html.Span('Fraud Percentage: ', className='stat-label'),
+                                html.Span(f"{ecom_stats['fraud_percentage']}%", className='stat-value fraud-value')
+                            ])
+                        ], className='stat-details')
+                    ])
+                ], className='stat-card')
+            ], className='col-md-6'),
 
+            html.Div([
+                html.Div([
+                    html.I(className='fas fa-credit-card stat-icon'),
+                    html.Div([
+                        html.H3('Credit Card Transactions'),
+                        html.Div([
+                            html.P([
+                                html.Span('Total Transactions: ', className='stat-label'),
+                                html.Span(f"{credit_stats['total_transactions']:,}", className='stat-value')
+                            ]),
+                            html.P([
+                                html.Span('Fraud Cases: ', className='stat-label'),
+                                html.Span(f"{credit_stats['fraud_cases']:,}", className='stat-value fraud-value')
+                            ]),
+                            html.P([
+                                html.Span('Fraud Percentage: ', className='stat-label'),
+                                html.Span(f"{credit_stats['fraud_percentage']}%", className='stat-value fraud-value')
+                            ])
+                        ], className='stat-details')
+                    ])
+                ], className='stat-card')
+            ], className='col-md-6')
+        ], className='row stats-container'),
+
+        # Charts Section
         html.Div([
-            html.H3('Credit Card Transactions'),
-            html.P(f"Total Transactions: {credit_stats['total_transactions']:,}"),
-            html.P(f"Fraud Cases: {credit_stats['fraud_cases']:,}"),
-            html.P(f"Fraud Percentage: {credit_stats['fraud_percentage']}%")
-        ], className='stat-card')
-    ], className='stats-container'),
+            html.Div([
+                html.H3('Fraud Trends Over Time', className='chart-title'),
+                dcc.Graph(id='fraud-trends')
+            ], className='chart-card mb-4'),
 
-    # Charts Section
-    html.Div([
-        dcc.Graph(id='fraud-trends'),
-        dcc.Graph(id='fraud-map')
-    ], className='charts-container')
+            html.Div([
+                html.H3('Geographical Distribution of Fraud', className='chart-title'),
+                dcc.Graph(
+                    id='geo-distribution',
+                    figure=px.choropleth(
+                        fraud_data_processed[fraud_data_processed['class'] == 1].groupby('country').size().reset_index(name='count'),
+                        locations='country',
+                        locationmode='country names',
+                        color='count',
+                        color_continuous_scale='Reds',
+                        template='plotly_white'
+                    )
+                )
+            ], className='chart-card mb-4'),
+
+            html.Div([
+                html.H3('Fraud by Device', className='chart-title'),
+                dcc.Graph(id='fraud-device')
+            ], className='chart-card mb-4'),
+
+            html.Div([
+                html.H3('Fraud by Browser', className='chart-title'),
+                dcc.Graph(id='fraud-browser')
+            ], className='chart-card mb-4')
+        ], className='charts-container')
+    ], className='main-content')
 ])
 
 # Callbacks for interactivity
 @app.callback(
     [Output('fraud-trends', 'figure'),
-     Output('fraud-map', 'figure')],
-    [Input('country-filter', 'value')]
+     Output('fraud-device', 'figure'),
+     Output('fraud-browser', 'figure')],
+    [Input('filter-button', 'n_clicks')],
+    [State('date-filter', 'start_date'),
+     State('date-filter', 'end_date'),
+     State('geo-distribution', 'clickData')]
 )
-def update_charts(selected_country):
-    if selected_country:
-        filtered_data = fraud_data_processed[fraud_data_processed['country'] == selected_country]
-        js_alert = f"showAlert('Filtered by country: {selected_country} with {len(filtered_data)} records.');"
-    else:
-        filtered_data = fraud_data_processed
-        js_alert = f"showAlert('Showing data for all countries.');"
+def update_charts(n_clicks, start_date, end_date, geo_click_data):
+    # Filter data based on date
+    filtered_data = fraud_data_processed[
+        (fraud_data_processed['purchase_time'] >= start_date) &
+        (fraud_data_processed['purchase_time'] <= end_date)
+    ]
 
-    # Execute the JavaScript alert
-    app.layout.children.append(html.Script(js_alert))
+    # Apply country filter if a country is clicked
+    if geo_click_data:
+        country = geo_click_data['points'][0]['location']
+        filtered_data = filtered_data[filtered_data['country'] == country]
 
-    # Update the fraud trends chart
-    fraud_trends = px.line(
+    # Create updated figures
+    fraud_trends_fig = px.line(
         filtered_data.groupby(filtered_data['purchase_time'].dt.date)['class'].sum().reset_index(),
-        x='purchase_time',
-        y='class',
-        title='Fraud Trends Over Time'
+        x='purchase_time', y='class', template='plotly_white'
+    ).update_traces(line_color='#e74c3c')
+
+    fraud_device_fig = px.bar(
+        filtered_data.groupby(['device_id', 'class']).size().unstack().fillna(0),
+        template='plotly_white', color_discrete_sequence=['#2ecc71', '#e74c3c']
     )
 
-    # Update the fraud map
-    fraud_map = px.choropleth(
-        filtered_data[filtered_data['class'] == 1].groupby('country').size().reset_index(name='count'),
-        locations='country',
-        locationmode='country names',
-        color='count',
-        title='Geographical Distribution of Fraud',
-        color_continuous_scale='Reds'
+    fraud_browser_fig = px.bar(
+        filtered_data.groupby(['browser', 'class']).size().unstack().fillna(0),
+        template='plotly_white', color_discrete_sequence=['#2ecc71', '#e74c3c']
     )
 
-    return fraud_trends, fraud_map
+    return fraud_trends_fig, fraud_device_fig, fraud_browser_fig
+
 
 app.index_string = '''
 <!DOCTYPE html>
@@ -352,6 +414,41 @@ app.index_string = '''
     .col-md-6 {
         max-width: 45%; /* Wider width for specific charts */
     }
+
+    .filters-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .date-picker {
+        flex: 1;
+    }
+
+    .filter-button {
+        padding: 0.5rem 1rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .filter-button:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    
 </style>
 
 </head>
