@@ -1,4 +1,4 @@
-from dash import Dash, html, dcc
+from dash import Dash, html, dcc, Input, Output, State, callback_context
 import plotly.express as px
 import pandas as pd
 from flask import Flask
@@ -74,13 +74,29 @@ fraud_data, credit_data, ip_country = load_data()
 fraud_data_processed = process_ecommerce_data(fraud_data, ip_country)
 ecom_stats, credit_stats = create_summary_stats(fraud_data_processed, credit_data)
 
-# Create the dashboard layout
+# App layout
 app.layout = html.Div([
     # Navigation bar
     html.Div([
         html.H1('Fraud Detection Dashboard', className='nav-title'),
         html.P('fraud analytics and insights', className='nav-subtitle')
     ], className='navbar'),
+
+    # Filters
+    html.Div([
+        dcc.DatePickerRange(
+            id='date-filter',
+            start_date=fraud_data_processed['purchase_time'].min(),
+            end_date=fraud_data_processed['purchase_time'].max(),
+            display_format='YYYY-MM-DD',
+            className='date-picker'
+        ),
+        html.Button('Filter', id='filter-button', className='filter-button'),
+        html.Button('Reset Filters', id='reset-button', className='filter-button')
+    ], className='filters-container'),
+
+    # Alert message
+    html.Div(id='alert-message', className='alert-message', style={'display': 'none'}),
 
     # Main content container
     html.Div([
@@ -136,55 +152,27 @@ app.layout = html.Div([
         # Charts Section
         html.Div([
             html.Div([
-                html.Div([
-                    html.H3('Fraud Trends Over Time', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.line(
-                            fraud_data_processed.groupby(fraud_data_processed['purchase_time'].dt.date)['class'].sum().reset_index(),
-                            x='purchase_time',
-                            y='class',
-                            template='plotly_white'
-                        ).update_traces(line_color='#e74c3c')
-                    )
-                ], className='chart-card')
-            ], className='mb-4'),
+                html.H3('Fraud Trends Over Time', className='chart-title'),
+                dcc.Graph(id='fraud-trends')
+            ], className='chart-card mb-4'),
 
             html.Div([
-                html.H3('Geographical Distribution of Fraud', className='chart-title'),
-                dcc.Graph(
-                    figure=px.choropleth(
-                        fraud_data_processed[fraud_data_processed['class'] == 1].groupby('country').size().reset_index(name='count'),
-                        locations='country',
-                        locationmode='country names',
-                        color='count',
-                        color_continuous_scale='Reds',
-                        template='plotly_white'
-                    )
-                )
-            ], className='chart-card mb-4'),
+                html.H3('Geographical Distribution of Fraud', 
+                        className='chart-title', 
+                        style={'textAlign': 'center', 'marginBottom': '15px'}),
+                dcc.Graph(id='geo-distribution', className='chart-card mb-4')
+            ], style={'padding': '20px', 'backgroundColor': 'white', 'borderRadius': '8px', 'boxShadow': '0 2px 4px rgba(0, 0, 0, 0.1)'}),
 
             # Device and Browser Analysis
             html.Div([
                 html.Div([
                     html.H3('Fraud by Device', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.bar(
-                            fraud_data_processed.groupby(['device_id', 'class']).size().unstack().fillna(0),
-                            template='plotly_white',
-                            color_discrete_sequence=['#2ecc71', '#e74c3c']
-                        )
-                    )
+                    dcc.Graph(id='fraud-device')
                 ], className='chart-card col-md-6'),
 
                 html.Div([
                     html.H3('Fraud by Browser', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.bar(
-                            fraud_data_processed.groupby(['browser', 'class']).size().unstack().fillna(0),
-                            template='plotly_white',
-                            color_discrete_sequence=['#2ecc71', '#e74c3c']
-                        )
-                    )
+                    dcc.Graph(id='fraud-browser')
                 ], className='chart-card col-md-6')
             ], className='row mb-4'),
 
@@ -192,37 +180,163 @@ app.layout = html.Div([
             html.Div([
                 html.Div([
                     html.H3('Fraud by Hour of Day', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.bar(
-                            fraud_data_processed[fraud_data_processed['class'] == 1].groupby('purchase_hour').size(),
-                            template='plotly_white',
-                            color_discrete_sequence=['#e74c3c']
-                        ).update_layout(
-                            xaxis_title='Hour of Day',
-                            yaxis_title='Number of Fraud Cases'
-                        )
-                    )
+                    dcc.Graph(id='fraud-hour')
                 ], className='chart-card col-md-6'),
 
                 html.Div([
                     html.H3('Fraud by Day of Week', className='chart-title'),
-                    dcc.Graph(
-                        figure=px.bar(
-                            fraud_data_processed[fraud_data_processed['class'] == 1].groupby('purchase_day').size(),
-                            template='plotly_white',
-                            color_discrete_sequence=['#e74c3c']
-                        ).update_layout(
-                            xaxis_title='Day of Week',
-                            yaxis_title='Number of Fraud Cases'
-                        )
-                    )
+                    dcc.Graph(id='fraud-day')
                 ], className='chart-card col-md-6')
             ], className='row mb-4')
         ], className='charts-container')
     ], className='main-content')
 ])
 
-# CSS and Enhanced Styling
+# Callbacks for interactivity
+@app.callback(
+    [
+        Output('fraud-trends', 'figure'),
+        Output('fraud-device', 'figure'),
+        Output('fraud-browser', 'figure'),
+        Output('fraud-hour', 'figure'),
+        Output('fraud-day', 'figure'),
+        Output('alert-message', 'children'),
+        Output('alert-message', 'style'),
+    ],
+    [
+        Input('filter-button', 'n_clicks'),
+        Input('reset-button', 'n_clicks'),
+        Input('geo-distribution', 'clickData')
+    ],
+    [
+        State('date-filter', 'start_date'),
+        State('date-filter', 'end_date')
+    ]
+)
+
+def update_charts(filter_clicks, reset_clicks, geo_click_data, start_date, end_date):
+    ctx = callback_context
+    filtered_data = fraud_data_processed
+    alert_message = ""
+    alert_style = {'display': 'none'}
+
+    # Default behavior: no filters applied
+    if not ctx.triggered or ctx.triggered[0]['prop_id'] == 'reset-button.n_clicks':
+        alert_message = "Displaying unfiltered data."
+        alert_style = {'display': 'block', 'color': 'blue'}
+
+    # Check which input triggered the callback
+    if ctx.triggered:
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+        if button_id == 'filter-button' and start_date and end_date:
+            # Convert start_date and end_date to datetime
+            start_date = pd.to_datetime(start_date)
+            end_date = pd.to_datetime(end_date)
+            filtered_data = fraud_data_processed[
+                (fraud_data_processed['purchase_time'] >= start_date) &
+                (fraud_data_processed['purchase_time'] <= end_date)
+            ]
+            alert_message = f"Filters applied from {start_date.date()} to {end_date.date()}."
+            alert_style = {'display': 'block', 'color': 'green'}
+
+        elif button_id == 'geo-distribution' and geo_click_data:
+            # Apply geographical filter if a country is clicked
+            try:
+                country = geo_click_data['points'][0]['location']
+                filtered_data = filtered_data[filtered_data['country'] == country]
+                alert_message = f"Filtered by country: {country}"
+                alert_style = {'display': 'block', 'color': 'green'}
+            except (KeyError, IndexError):
+                alert_message = "Error retrieving country data."
+                alert_style = {'display': 'block', 'color': 'red'}
+
+    # Generate updated figures
+    try:
+        fraud_trends_fig = px.line(
+            filtered_data.groupby(filtered_data['purchase_time'].dt.date)['class'].sum().reset_index(),
+            x='purchase_time', y='class', template='plotly_white'
+        ).update_traces(line_color='#e74c3c')
+
+        fraud_device_fig = px.bar(
+            filtered_data.groupby(['device_id', 'class']).size().unstack().fillna(0),
+            template='plotly_white', color_discrete_sequence=['#2ecc71', '#e74c3c']
+        )
+
+        fraud_browser_fig = px.bar(
+            filtered_data.groupby(['browser', 'class']).size().unstack().fillna(0),
+            template='plotly_white', color_discrete_sequence=['#2ecc71', '#e74c3c']
+        )
+
+        fraud_hour_fig = px.bar(
+            filtered_data[filtered_data['class'] == 1].groupby('purchase_hour').size(),
+            template='plotly_white', color_discrete_sequence=['#e74c3c']
+        ).update_layout(
+            xaxis_title='Hour of Day',
+            yaxis_title='Number of Fraud Cases'
+        )
+
+        fraud_day_fig = px.bar(
+            filtered_data[filtered_data['class'] == 1].groupby('purchase_day').size(),
+            template='plotly_white', color_discrete_sequence=['#e74c3c']
+        ).update_layout(
+            xaxis_title='Day of Week',
+            yaxis_title='Number of Fraud Cases'
+        )
+    except Exception as e:
+        print(f"Error generating figures: {e}")
+        alert_message = "Error updating charts. Please check the data or filters."
+        alert_style = {'display': 'block', 'color': 'red'}
+        fraud_trends_fig = fraud_device_fig = fraud_browser_fig = fraud_hour_fig = fraud_day_fig = {}
+
+    return fraud_trends_fig, fraud_device_fig, fraud_browser_fig, fraud_hour_fig, fraud_day_fig, alert_message, alert_style
+
+
+# Initialize geographical distribution chart
+@app.callback(
+    Output('geo-distribution', 'figure'),
+    Input('geo-distribution', 'id')
+)
+def initialize_geo_chart(_):
+    geo_fig = px.choropleth(
+        fraud_data_processed[fraud_data_processed['class'] == 1]
+        .groupby('country')
+        .size()
+        .reset_index(name='count'),
+        locations='country',
+        locationmode='country names',
+        color='count',
+        color_continuous_scale='Reds',
+        template='plotly_white',
+        labels={'count': 'Fraud Cases'},
+        hover_name='country'
+    ).update_layout(
+        geo=dict(
+            showframe=False,
+            showcoastlines=True,
+            projection_type='natural earth',
+            landcolor='whitesmoke',
+            lakecolor='white',
+            showocean=True,
+            oceancolor='aliceblue'
+        ),
+        margin=dict(l=10, r=10, t=40, b=10),
+        coloraxis_colorbar=dict(
+            title="Fraud Cases",
+            titlefont=dict(size=12),
+            tickvals=[100, 1000, 3000, 4000, 5500],
+            tickformat=',d',
+            thickness=12,
+            len=0.5
+        )
+    ).update_traces(
+        hovertemplate="<b>Country:</b> %{location}<br><b>Fraud Cases:</b> %{z}<extra></extra>"
+    )
+
+    return geo_fig
+
+
+
 app.index_string = '''
 <!DOCTYPE html>
 <html>
@@ -416,6 +530,41 @@ app.index_string = '''
     .col-md-6 {
         max-width: 45%; /* Wider width for specific charts */
     }
+
+    .filters-container {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+    }
+
+    .date-picker {
+        flex: 1;
+    }
+
+    .filter-button {
+        padding: 0.5rem 1rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .filter-button:hover {
+        background-color: #0056b3;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    
 </style>
 
 </head>
@@ -430,5 +579,7 @@ app.index_string = '''
 </html>
 '''
 
-if __name__ == "__main__":
-    app.run_server(host="0.0.0.0", port=8080, debug=False)
+# Run app
+if __name__ == '__main__':
+    app.run_server(debug=True)
+
